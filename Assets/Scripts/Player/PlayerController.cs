@@ -5,69 +5,94 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    public float speed;
-    private bool ctrl;
-    public Rigidbody rigidbody;
-    private bool alt;
-    // Start is called before the first frame update
+    private Rigidbody rigidbody;
+    public float speed= 1;
+    public float turnspeed = 10;
+    public float max_speed = 20;
+    public GameObject camera;
+
     void Start()
     {
-        ctrl = false;
+        rigidbody = GetComponent<Rigidbody>();
     }
 
-    // Update is called once per frame
+    void UpdateVelocityDirection()
+    {
+        rigidbody.velocity = transform.forward * transform.InverseTransformDirection(rigidbody.velocity).z;
+    }
+
+    void rotateCamera(bool forwards)
+    {
+        if (forwards)
+        {
+            camera.transform.eulerAngles = new Vector3(0, 0, 0);
+        }
+        else
+        {
+            camera.transform.eulerAngles = new Vector3(0, 180, 0);
+        }
+    }
+
     void FixedUpdate()
     {
-        if (Input.GetKey(KeyCode.LeftControl))
+        if (Input.GetKey(KeyCode.UpArrow))
         {
-            ctrl = true;
+            rigidbody.velocity += transform.forward * speed;
+            rotateCamera(true);
         }
-        else
+        
+        if (Input.GetKey(KeyCode.DownArrow))
         {
-            ctrl = false;
-        }
-
-        if (Input.GetKey(KeyCode.LeftAlt))
-        {
-            alt = true;
-        }
-        else
-        {
-            alt = false;
+            rigidbody.velocity += -transform.forward * speed;
+            rotateCamera(false);
         }
 
-        if (Input.GetKey("space"))
+        if (Input.GetKey(KeyCode.RightArrow))
         {
-            if (ctrl)
+            transform.Rotate(new Vector3(0, 1, 0) * Time.fixedDeltaTime * turnspeed, Space.World);
+            UpdateVelocityDirection();
+        }
+
+        if (Input.GetKey(KeyCode.LeftArrow))
+        {
+            transform.Rotate(new Vector3(0, -1, 0) * Time.fixedDeltaTime * turnspeed, Space.World);
+            UpdateVelocityDirection();
+        }
+
+        /*if (Input.GetKey(KeyCode.LeftControl))
+        {
+            //brake
+            float current_speed = rigidbody.velocity.magnitude;
+            float new_speed=0;
+            if (current_speed > 0)
             {
-                rigidbody.velocity += new Vector3(0,0,-speed);
+                //going forwards
+                if (current_speed > speed)
+                {
+                    new_speed = current_speed - speed;
+                }
+                else
+                {
+                    new_speed = 0;
+                }
+            }
+            else if(current_speed < 0)
+            {
+                //going backwards
+                if(current_speed < -speed)
+                {
+                    new_speed = current_speed+speed;
+                }
+                else
+                {
+                    new_speed = 0;
+                }
             }
             else
             {
-                // move forwards
-                rigidbody.velocity += new Vector3(0, 0, speed);
+                new_speed = 0;
             }
-        }
-        else
-        {
-            if (alt)
-            {
-                //brake
-                float currentvel = rigidbody.velocity.z;
-
-                if(Math.Abs(currentvel) >= speed)
-                {
-                    if (currentvel > 0)
-                    {
-                        currentvel = speed;
-                    }
-                    else
-                    {
-                        currentvel = -speed;
-                    }
-                }
-                rigidbody.velocity += new Vector3(0, 0, -currentvel);
-            }
-        }
-    }
+            rigidbody.velocity += transform.forward * new_speed; 
+        }*/
+    }   
 }
