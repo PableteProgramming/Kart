@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,6 +7,8 @@ public class PlayerController : MonoBehaviour
 {
     public float speed;
     private bool ctrl;
+    public Rigidbody rigidbody;
+    private bool alt;
     // Start is called before the first frame update
     void Start()
     {
@@ -24,16 +27,46 @@ public class PlayerController : MonoBehaviour
             ctrl = false;
         }
 
+        if (Input.GetKey(KeyCode.LeftAlt))
+        {
+            alt = true;
+        }
+        else
+        {
+            alt = false;
+        }
+
         if (Input.GetKey("space"))
         {
             if (ctrl)
             {
-                transform.position += -transform.forward * speed * Time.deltaTime;
+                rigidbody.velocity += new Vector3(0,0,-speed);
             }
             else
             {
                 // move forwards
-                transform.position += transform.forward * speed * Time.deltaTime;
+                rigidbody.velocity += new Vector3(0, 0, speed);
+            }
+        }
+        else
+        {
+            if (alt)
+            {
+                //brake
+                float currentvel = rigidbody.velocity.z;
+
+                if(Math.Abs(currentvel) >= speed)
+                {
+                    if (currentvel > 0)
+                    {
+                        currentvel = speed;
+                    }
+                    else
+                    {
+                        currentvel = -speed;
+                    }
+                }
+                rigidbody.velocity += new Vector3(0, 0, -currentvel);
             }
         }
     }
