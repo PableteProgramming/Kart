@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
     public float turnspeed = 10;
     public float max_speed = 20;
     public GameObject camera;
+    public float brake_speed = 0.8f;
 
     void Start()
     {
@@ -33,15 +34,34 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    void Brake()
+    {
+        //brake
+        float vel = transform.InverseTransformDirection(rigidbody.velocity).z;
+        if (vel != 0) //if moving
+        {
+            float new_speed = 0;
+            if (vel < 0 && vel < -brake_speed) //if moving backwards
+            {
+                new_speed = vel + brake_speed;
+            }
+            else if (vel > 0 && vel > brake_speed)
+            {
+                new_speed = vel - brake_speed;
+            }
+            rigidbody.velocity = transform.forward * new_speed;
+        }
+    }
+
     void FixedUpdate()
     {
-        if (Input.GetKey(KeyCode.UpArrow))
+        if (Input.GetKey(KeyCode.UpArrow) && !Input.GetKey(KeyCode.LeftControl))
         {
             rigidbody.velocity += transform.forward * speed;
             rotateCamera(true);
         }
         
-        if (Input.GetKey(KeyCode.DownArrow))
+        if (Input.GetKey(KeyCode.DownArrow) && !Input.GetKey(KeyCode.LeftControl))
         {
             rigidbody.velocity += -transform.forward * speed;
             rotateCamera(false);
@@ -59,40 +79,9 @@ public class PlayerController : MonoBehaviour
             UpdateVelocityDirection();
         }
 
-        /*if (Input.GetKey(KeyCode.LeftControl))
+        if (Input.GetKey(KeyCode.LeftControl))
         {
-            //brake
-            float current_speed = rigidbody.velocity.magnitude;
-            float new_speed=0;
-            if (current_speed > 0)
-            {
-                //going forwards
-                if (current_speed > speed)
-                {
-                    new_speed = current_speed - speed;
-                }
-                else
-                {
-                    new_speed = 0;
-                }
-            }
-            else if(current_speed < 0)
-            {
-                //going backwards
-                if(current_speed < -speed)
-                {
-                    new_speed = current_speed+speed;
-                }
-                else
-                {
-                    new_speed = 0;
-                }
-            }
-            else
-            {
-                new_speed = 0;
-            }
-            rigidbody.velocity += transform.forward * new_speed; 
-        }*/
+            Brake();
+        }
     }   
 }
