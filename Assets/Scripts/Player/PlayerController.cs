@@ -26,11 +26,11 @@ public class PlayerController : MonoBehaviour
     {
         if (forwards)
         {
-            camera.transform.eulerAngles = new Vector3(0, 0, 0);
+            camera.transform.localEulerAngles = new Vector3(0, 0, 0);
         }
         else
         {
-            camera.transform.eulerAngles = new Vector3(0, 180, 0);
+            camera.transform.localEulerAngles = new Vector3(0, 180, 0);
         }
     }
 
