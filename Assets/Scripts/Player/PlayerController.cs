@@ -17,9 +17,14 @@ public class PlayerController : MonoBehaviour
         rigidbody = GetComponent<Rigidbody>();
     }
 
+    float GetPlayerSpeed()
+    {
+        return transform.InverseTransformDirection(rigidbody.velocity).z;
+    }
+
     void UpdateVelocityDirection()
     {
-        rigidbody.velocity = transform.forward * transform.InverseTransformDirection(rigidbody.velocity).z;
+        rigidbody.velocity = transform.forward * GetPlayerSpeed();
     }
 
     void rotateCamera(bool forwards)
@@ -37,7 +42,7 @@ public class PlayerController : MonoBehaviour
     void Brake()
     {
         //brake
-        float vel = transform.InverseTransformDirection(rigidbody.velocity).z;
+        float vel = GetPlayerSpeed();
         if (vel != 0) //if moving
         {
             float new_speed = 0;
@@ -55,6 +60,7 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
+        //Moving
         if (Input.GetKey(KeyCode.UpArrow) && !Input.GetKey(KeyCode.LeftControl))
         {
             rigidbody.velocity += transform.forward * speed;
@@ -67,6 +73,8 @@ public class PlayerController : MonoBehaviour
             rotateCamera(false);
         }
 
+
+        //Rotating
         if (Input.GetKey(KeyCode.RightArrow))
         {
             transform.Rotate(new Vector3(0, 1, 0) * Time.fixedDeltaTime * turnspeed, Space.World);
@@ -79,9 +87,29 @@ public class PlayerController : MonoBehaviour
             UpdateVelocityDirection();
         }
 
+        //braking
         if (Input.GetKey(KeyCode.LeftControl))
         {
             Brake();
         }
-    }   
+
+        //Checking for max_speed
+        if(GetPlayerSpeed()> max_speed)
+        {
+            rigidbody.velocity = transform.forward * max_speed;
+        }
+        else if (GetPlayerSpeed() < -max_speed)
+        {
+            rigidbody.velocity = -transform.forward * max_speed;
+        }
+    }
+
+    void Update()
+    {
+        //Camera checks
+        if (transform.InverseTransformDirection(rigidbody.velocity).z == 0)
+        {
+            rotateCamera(true);
+        }
+    }
 }
